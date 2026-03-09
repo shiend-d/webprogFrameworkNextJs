@@ -9,6 +9,7 @@ type Product = {
   harga?: number;
   stok?: number;
   deskripsi?: string;
+  status_stok?: string;
   [key: string]: any;
 };
 
@@ -61,7 +62,13 @@ export default function ProdukPage() {
       const res = await fetch("/api/produk");
       const json: ApiResponse<Product[]> = await res.json();
       if (json.success) {
-        setProducts(json.data ?? []);
+        setProducts(
+          (json.data ?? []).map((row) => ({
+            ...row,
+            status_stok:
+              typeof row.stok === "number" && row.stok > 0 ? "Tersedia" : "Habis",
+          }))
+        );
       } else {
         console.error(json.message);
       }
@@ -176,6 +183,7 @@ export default function ProdukPage() {
         loading={loading}
         filterPlaceholder="Cari nama produk..."
         filterKeys={["nama"]}
+        filterableColumns={[{ key: "status_stok", label: "Status Stok" }]}
         onAdd={openCreate}
         onView={openView}
         onEdit={openEdit}

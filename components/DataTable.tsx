@@ -10,6 +10,11 @@ export type ColumnDef<T> = {
   render?: (value: any, row: T) => React.ReactNode;
 };
 
+type FilterableColumn<T> = {
+  key: keyof T;
+  label: string;
+};
+
 type DataTableProps<T> = {
   title: string;
   columns: ColumnDef<T>[];
@@ -17,6 +22,7 @@ type DataTableProps<T> = {
   loading?: boolean;
   filterPlaceholder?: string;
   filterKeys?: (keyof T)[];
+  filterableColumns?: FilterableColumn<T>[];
   onAdd?: () => void;
   onView?: (row: T) => void;
   onEdit?: (row: T) => void;
@@ -30,6 +36,7 @@ export function DataTable<T extends { id?: number | string }>({
   loading,
   filterPlaceholder = "Cari data...",
   filterKeys,
+  filterableColumns,
   onAdd,
   onView,
   onEdit,
@@ -37,20 +44,44 @@ export function DataTable<T extends { id?: number | string }>({
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [showFilter, setShowFilter] = useState(false);
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
   const pageSize = 10;
 
+  const distinctValues = useMemo(() => {
+    if (!filterableColumns || filterableColumns.length === 0) return {} as Record<string, string[]>;
+    const result: Record<string, string[]> = {};
+    for (const col of filterableColumns) {
+      result[String(col.key)] = Array.from(
+        new Set(data.map((row) => String(row[col.key] ?? "")).filter(Boolean))
+      ).sort();
+    }
+    return result;
+  }, [data, filterableColumns]);
+
+  const activeFilterCount = Object.values(columnFilters).filter(Boolean).length;
+
   const filtered = useMemo(() => {
-    if (!search.trim()) return data;
-    const q = search.toLowerCase();
-    return data.filter((row) => {
-      const entries = filterKeys && filterKeys.length > 0
-        ? filterKeys.map((key) => row[key])
-        : Object.values(row ?? {});
-      return entries.some((value) =>
-        String(value ?? "").toLowerCase().includes(q)
+    let result = data;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter((row) => {
+        const entries = filterKeys && filterKeys.length > 0
+          ? filterKeys.map((key) => row[key])
+          : Object.values(row ?? {});
+        return entries.some((value) =>
+          String(value ?? "").toLowerCase().includes(q)
+        );
+      });
+    }
+    for (const [key, val] of Object.entries(columnFilters)) {
+      if (!val) continue;
+      result = result.filter((row) =>
+        String((row as any)[key] ?? "") === val
       );
-    });
-  }, [data, search, filterKeys]);
+    }
+    return result;
+  }, [data, search, filterKeys, columnFilters]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -105,13 +136,55 @@ export function DataTable<T extends { id?: number | string }>({
           </button>
           <button
             type="button"
-            className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-emerald-500 hover:text-emerald-700"
+            className={`flex items-center gap-1 rounded-full border px-4 py-1.5 text-sm font-medium shadow-sm transition-colors ${
+              showFilter || activeFilterCount > 0
+                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                : "border-slate-200 bg-white text-slate-600 hover:border-emerald-500 hover:text-emerald-700"
+            }`}
+            onClick={() => setShowFilter((v) => !v)}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>Filter</span>
+            {activeFilterCount > 0 && (
+              <span className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
+
+      {showFilter && filterableColumns && filterableColumns.length > 0 && (
+        <div className="flex flex-wrap items-center gap-4 border-b border-slate-100 bg-slate-50/70 px-4 py-3 md:px-6">
+          {filterableColumns.map((col) => (
+            <div key={String(col.key)} className="flex items-center gap-2">
+              <label className="text-xs font-medium text-slate-600">{col.label}:</label>
+              <select
+                value={columnFilters[String(col.key)] ?? ""}
+                onChange={(e) => {
+                  setColumnFilters((prev) => ({ ...prev, [String(col.key)]: e.target.value }));
+                  setPage(1);
+                }}
+                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-emerald-500"
+              >
+                <option value="">Semua</option>
+                {distinctValues[String(col.key)]?.map((val) => (
+                  <option key={val} value={val}>{val}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={() => { setColumnFilters({}); setPage(1); }}
+              className="text-xs font-medium text-rose-500 hover:text-rose-700"
+            >
+              Reset Filter
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="w-full overflow-x-auto">
         <table className="min-w-full border-t border-slate-100 text-sm">

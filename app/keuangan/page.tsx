@@ -71,7 +71,12 @@ export default function KeuanganPage() {
       const res = await fetch("/api/transaksi");
       const json: ApiResponse<Transaction[]> = await res.json();
       if (json.success) {
-        setRows(json.data ?? []);
+        setRows(
+          (json.data ?? []).map((row) => ({
+            ...row,
+            kategori: row.kategori ?? row.jenis_transaksi ?? "Tidak diketahui",
+          }))
+        );
       }
     } catch (error) {
       console.error("Failed to fetch transaksi", error);
@@ -196,6 +201,7 @@ export default function KeuanganPage() {
         loading={loading}
         filterPlaceholder="Cari berdasarkan kategori..."
         filterKeys={["kategori", "jenis_transaksi"]}
+        filterableColumns={[{ key: "kategori", label: "Kategori" }]}
         onAdd={openCreate}
         onView={openView}
         onEdit={openEdit}

@@ -195,6 +195,7 @@ export default function BahanBakuPage() {
         loading={loading}
         filterPlaceholder="Cari tipe atau nama bahan..."
         filterKeys={["tipe", "nama"]}
+        filterableColumns={[{ key: "tipe", label: "Tipe" }]}
         onAdd={openCreate}
         onView={openView}
         onEdit={openEdit}
