@@ -37,8 +37,17 @@ export async function POST(req: NextRequest) {
     const db = getDB();
     const body = await req.json();
 
+    const payload = {
+      nama: body.nama,
+      tipe: body.tipe,
+      stok: body.stok != null ? Number(body.stok) : null,
+      satuan: body.satuan ?? null,
+      harga_satuan:
+        body.harga_satuan != null ? Number(body.harga_satuan) : null,
+    };
+
     const [result] = (await db.query("INSERT INTO bahan_baku SET ?", [
-      body,
+      payload,
     ])) as any;
 
     return NextResponse.json(
@@ -47,7 +56,7 @@ export async function POST(req: NextRequest) {
         message: "Bahan baku created successfully",
         data: {
           id: result.insertId,
-          ...body,
+          ...payload,
         },
       },
       { status: 200 }
@@ -79,7 +88,16 @@ export async function PUT(req: NextRequest) {
       delete body.id;
     }
 
-    await db.query("UPDATE bahan_baku SET ? WHERE id = ?", [body, id]);
+    const payload = {
+      nama: body.nama,
+      tipe: body.tipe,
+      stok: body.stok != null ? Number(body.stok) : null,
+      satuan: body.satuan ?? null,
+      harga_satuan:
+        body.harga_satuan != null ? Number(body.harga_satuan) : null,
+    };
+
+    await db.query("UPDATE bahan_baku SET ? WHERE id = ?", [payload, id]);
 
     return NextResponse.json(
       {
@@ -87,7 +105,7 @@ export async function PUT(req: NextRequest) {
         message: "Bahan baku updated successfully",
         data: {
           id,
-          ...body,
+          ...payload,
         },
       },
       { status: 200 }
