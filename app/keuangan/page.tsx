@@ -242,7 +242,6 @@ export default function KeuanganPage() {
                       modalMode === "view"
                         ? (selected?.kategori ??
                           selected?.jenis_transaksi ??
-                          "" ??
                           "")
                         : form.kategori
                     }
@@ -266,7 +265,6 @@ export default function KeuanganPage() {
                         ? (selected?.tanggal_transaksi ??
                           selected?.tanggal ??
                           selected?.["tanggal_waktu"] ??
-                          "" ??
                           "")
                         : form.tanggal
                     }
@@ -307,10 +305,7 @@ export default function KeuanganPage() {
                   rows={4}
                   value={
                     modalMode === "view"
-                      ? (selected?.["detail"] ??
-                        selected?.["deskripsi"] ??
-                        "" ??
-                        "")
+                      ? (selected?.["detail"] ?? selected?.["deskripsi"] ?? "")
                       : form.keterangan
                   }
                   onChange={(e) =>
