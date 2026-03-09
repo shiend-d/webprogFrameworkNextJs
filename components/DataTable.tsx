@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Eye, Pencil, Trash2, Plus } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
+  Plus,
+} from "lucide-react";
 
 export type ColumnDef<T> = {
   key: keyof T;
@@ -45,15 +52,18 @@ export function DataTable<T extends { id?: number | string }>({
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showFilter, setShowFilter] = useState(false);
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>(
+    {},
+  );
   const pageSize = 10;
 
   const distinctValues = useMemo(() => {
-    if (!filterableColumns || filterableColumns.length === 0) return {} as Record<string, string[]>;
+    if (!filterableColumns || filterableColumns.length === 0)
+      return {} as Record<string, string[]>;
     const result: Record<string, string[]> = {};
     for (const col of filterableColumns) {
       result[String(col.key)] = Array.from(
-        new Set(data.map((row) => String(row[col.key] ?? "")).filter(Boolean))
+        new Set(data.map((row) => String(row[col.key] ?? "")).filter(Boolean)),
       ).sort();
     }
     return result;
@@ -66,19 +76,20 @@ export function DataTable<T extends { id?: number | string }>({
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((row) => {
-        const entries = filterKeys && filterKeys.length > 0
-          ? filterKeys.map((key) => row[key])
-          : Object.values(row ?? {});
+        const entries =
+          filterKeys && filterKeys.length > 0
+            ? filterKeys.map((key) => row[key])
+            : Object.values(row ?? {});
         return entries.some((value) =>
-          String(value ?? "").toLowerCase().includes(q)
+          String(value ?? "")
+            .toLowerCase()
+            .includes(q),
         );
       });
     }
     for (const [key, val] of Object.entries(columnFilters)) {
       if (!val) continue;
-      result = result.filter((row) =>
-        String((row as any)[key] ?? "") === val
-      );
+      result = result.filter((row) => String((row as any)[key] ?? "") === val);
     }
     return result;
   }, [data, search, filterKeys, columnFilters]);
@@ -87,7 +98,7 @@ export function DataTable<T extends { id?: number | string }>({
   const currentPage = Math.min(page, totalPages);
   const pageData = filtered.slice(
     (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    currentPage * pageSize,
   );
 
   return (
@@ -97,7 +108,8 @@ export function DataTable<T extends { id?: number | string }>({
           <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
           <p className="text-xs text-slate-500">
             Menampilkan {filtered.length} data{" "}
-            {filtered.length !== data.length && `(difilter dari ${data.length})`}
+            {filtered.length !== data.length &&
+              `(difilter dari ${data.length})`}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -120,8 +132,7 @@ export function DataTable<T extends { id?: number | string }>({
                   setSearch("");
                   setPage(1);
                 }}
-                className="ml-2 text-xs font-medium text-slate-500 hover:text-slate-700"
-              >
+                className="ml-2 text-xs font-medium text-slate-500 hover:text-slate-700">
                 Hapus
               </button>
             )}
@@ -129,8 +140,7 @@ export function DataTable<T extends { id?: number | string }>({
           <button
             type="button"
             className="flex items-center gap-1 rounded-full border border-emerald-700 bg-emerald-700 px-4 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-800"
-            onClick={onAdd}
-          >
+            onClick={onAdd}>
             <Plus className="h-3.5 w-3.5" />
             <span>Tambah Data</span>
           </button>
@@ -141,8 +151,7 @@ export function DataTable<T extends { id?: number | string }>({
                 ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                 : "border-slate-200 bg-white text-slate-600 hover:border-emerald-500 hover:text-emerald-700"
             }`}
-            onClick={() => setShowFilter((v) => !v)}
-          >
+            onClick={() => setShowFilter((v) => !v)}>
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>Filter</span>
             {activeFilterCount > 0 && (
@@ -158,18 +167,24 @@ export function DataTable<T extends { id?: number | string }>({
         <div className="flex flex-wrap items-center gap-4 border-b border-slate-100 bg-slate-50/70 px-4 py-3 md:px-6">
           {filterableColumns.map((col) => (
             <div key={String(col.key)} className="flex items-center gap-2">
-              <label className="text-xs font-medium text-slate-600">{col.label}:</label>
+              <label className="text-xs font-medium text-slate-600">
+                {col.label}:
+              </label>
               <select
                 value={columnFilters[String(col.key)] ?? ""}
                 onChange={(e) => {
-                  setColumnFilters((prev) => ({ ...prev, [String(col.key)]: e.target.value }));
+                  setColumnFilters((prev) => ({
+                    ...prev,
+                    [String(col.key)]: e.target.value,
+                  }));
                   setPage(1);
                 }}
-                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-emerald-500"
-              >
+                className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700 outline-none focus:border-emerald-500">
                 <option value="">Semua</option>
                 {distinctValues[String(col.key)]?.map((val) => (
-                  <option key={val} value={val}>{val}</option>
+                  <option key={val} value={val}>
+                    {val}
+                  </option>
                 ))}
               </select>
             </div>
@@ -177,9 +192,11 @@ export function DataTable<T extends { id?: number | string }>({
           {activeFilterCount > 0 && (
             <button
               type="button"
-              onClick={() => { setColumnFilters({}); setPage(1); }}
-              className="text-xs font-medium text-rose-500 hover:text-rose-700"
-            >
+              onClick={() => {
+                setColumnFilters({});
+                setPage(1);
+              }}
+              className="text-xs font-medium text-rose-500 hover:text-rose-700">
               Reset Filter
             </button>
           )}
@@ -200,10 +217,9 @@ export function DataTable<T extends { id?: number | string }>({
                     col.align === "right"
                       ? "text-right"
                       : col.align === "center"
-                      ? "text-center"
-                      : "text-left"
-                  }`}
-                >
+                        ? "text-center"
+                        : "text-left"
+                  }`}>
                   {col.header}
                 </th>
               ))}
@@ -217,8 +233,7 @@ export function DataTable<T extends { id?: number | string }>({
               <tr>
                 <td
                   colSpan={columns.length + 2}
-                  className="px-4 py-8 text-center text-sm text-slate-500"
-                >
+                  className="px-4 py-8 text-center text-sm text-slate-500">
                   Memuat data...
                 </td>
               </tr>
@@ -226,8 +241,7 @@ export function DataTable<T extends { id?: number | string }>({
               <tr>
                 <td
                   colSpan={columns.length + 2}
-                  className="px-4 py-8 text-center text-sm text-slate-500"
-                >
+                  className="px-4 py-8 text-center text-sm text-slate-500">
                   Tidak ada data yang ditampilkan.
                 </td>
               </tr>
@@ -235,8 +249,7 @@ export function DataTable<T extends { id?: number | string }>({
               pageData.map((row, index) => (
                 <tr
                   key={(row.id as string | number | undefined) ?? index}
-                  className={index % 2 === 0 ? "bg-white" : "bg-slate-50/60"}
-                >
+                  className={index % 2 === 0 ? "bg-white" : "bg-slate-50/60"}>
                   <td className="border-b border-slate-100 px-4 py-2.5 text-center text-xs text-slate-600">
                     {(currentPage - 1) * pageSize + index + 1}
                   </td>
@@ -245,15 +258,16 @@ export function DataTable<T extends { id?: number | string }>({
                       col.align === "right"
                         ? "text-right"
                         : col.align === "center"
-                        ? "text-center"
-                        : "text-left";
+                          ? "text-center"
+                          : "text-left";
                     const value = row[col.key];
                     return (
                       <td
                         key={String(col.key)}
-                        className={`border-b border-slate-100 px-4 py-2.5 text-xs text-slate-800 ${align}`}
-                      >
-                        {col.render ? col.render(value, row) : String(value ?? "-")}
+                        className={`border-b border-slate-100 px-4 py-2.5 text-xs text-slate-800 ${align}`}>
+                        {col.render
+                          ? col.render(value, row)
+                          : String(value ?? "-")}
                       </td>
                     );
                   })}
@@ -262,22 +276,19 @@ export function DataTable<T extends { id?: number | string }>({
                       <button
                         type="button"
                         className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                        onClick={() => onView?.(row)}
-                      >
+                        onClick={() => onView?.(row)}>
                         <Eye className="h-3.5 w-3.5" />
                       </button>
                       <button
                         type="button"
                         className="flex h-8 w-8 items-center justify-center rounded-md bg-sky-50 text-sky-700 hover:bg-sky-100"
-                        onClick={() => onEdit?.(row)}
-                      >
+                        onClick={() => onEdit?.(row)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         type="button"
                         className="flex h-8 w-8 items-center justify-center rounded-md bg-rose-50 text-rose-700 hover:bg-rose-100"
-                        onClick={() => onDelete?.(row)}
-                      >
+                        onClick={() => onDelete?.(row)}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
@@ -306,8 +317,7 @@ export function DataTable<T extends { id?: number | string }>({
                   active
                     ? "border-emerald-700 bg-emerald-700 text-white"
                     : "border-slate-200 bg-white text-slate-600 hover:border-emerald-500 hover:text-emerald-700"
-                }`}
-              >
+                }`}>
                 {pageNumber}
               </button>
             );
@@ -317,4 +327,3 @@ export function DataTable<T extends { id?: number | string }>({
     </section>
   );
 }
-

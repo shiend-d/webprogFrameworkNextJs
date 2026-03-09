@@ -45,7 +45,7 @@ export default function ProdukPage() {
         render: (value: number) =>
           typeof value === "number"
             ? value.toLocaleString("id-ID")
-            : value ?? "-",
+            : (value ?? "-"),
       },
       {
         key: "stok",
@@ -53,7 +53,7 @@ export default function ProdukPage() {
         align: "center",
       },
     ],
-    []
+    [],
   );
 
   async function fetchProducts() {
@@ -66,8 +66,10 @@ export default function ProdukPage() {
           (json.data ?? []).map((row) => ({
             ...row,
             status_stok:
-              typeof row.stok === "number" && row.stok > 0 ? "Tersedia" : "Habis",
-          }))
+              typeof row.stok === "number" && row.stok > 0
+                ? "Tersedia"
+                : "Habis",
+          })),
         );
       } else {
         console.error(json.message);
@@ -148,7 +150,7 @@ export default function ProdukPage() {
   async function handleDelete(row: Product) {
     if (!row.id) return;
     const confirmed = window.confirm(
-      `Hapus produk "${row.nama ?? row.id}" dari data?`
+      `Hapus produk "${row.nama ?? row.id}" dari data?`,
     );
     if (!confirmed) return;
 
@@ -204,9 +206,7 @@ export default function ProdukPage() {
             <div className="space-y-4 overflow-y-auto px-6 py-4 text-xs text-black">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="font-medium text-black">
-                    ID Produk
-                  </label>
+                  <label className="font-medium text-black">ID Produk</label>
                   <input
                     type="text"
                     value={selected?.id ?? "-"}
@@ -215,12 +215,12 @@ export default function ProdukPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-medium text-black">
-                    Nama Produk
-                  </label>
+                  <label className="font-medium text-black">Nama Produk</label>
                   <input
                     type="text"
-                    value={modalMode === "view" ? selected?.nama ?? "" : form.nama}
+                    value={
+                      modalMode === "view" ? (selected?.nama ?? "") : form.nama
+                    }
                     onChange={(e) =>
                       modalMode !== "view" &&
                       setForm((f) => ({ ...f, nama: e.target.value }))
@@ -238,8 +238,8 @@ export default function ProdukPage() {
                     type="number"
                     value={
                       modalMode === "view"
-                        ? selected?.harga ?? ""
-                        : form.harga ?? ""
+                        ? (selected?.harga ?? "")
+                        : (form.harga ?? "")
                     }
                     onChange={(e) =>
                       modalMode !== "view" &&
@@ -255,7 +255,9 @@ export default function ProdukPage() {
                   <input
                     type="number"
                     value={
-                      modalMode === "view" ? selected?.stok ?? "" : form.stok ?? ""
+                      modalMode === "view"
+                        ? (selected?.stok ?? "")
+                        : (form.stok ?? "")
                     }
                     onChange={(e) =>
                       modalMode !== "view" &&
@@ -269,15 +271,13 @@ export default function ProdukPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-black">
-                  Detail Produk
-                </label>
+                <label className="font-medium text-black">Detail Produk</label>
                 <textarea
                   rows={4}
                   value={
                     modalMode === "view"
-                      ? selected?.deskripsi ?? ""
-                      : form.deskripsi ?? ""
+                      ? (selected?.deskripsi ?? "")
+                      : (form.deskripsi ?? "")
                   }
                   onChange={(e) =>
                     modalMode !== "view" &&
@@ -294,8 +294,7 @@ export default function ProdukPage() {
               <button
                 type="button"
                 onClick={() => setModalMode(null)}
-                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300"
-              >
+                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300">
                 Tutup
               </button>
               {modalMode === "view" && (
@@ -305,15 +304,13 @@ export default function ProdukPage() {
                     onClick={() => {
                       if (selected) openEdit(selected);
                     }}
-                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-                  >
+                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
                     Edit Data
                   </button>
                   <button
                     type="button"
                     onClick={() => selected && handleDelete(selected)}
-                    className="rounded-md bg-rose-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-600"
-                  >
+                    className="rounded-md bg-rose-500 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-600">
                     Hapus
                   </button>
                 </>
@@ -323,13 +320,12 @@ export default function ProdukPage() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
-                >
+                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70">
                   {submitting
                     ? "Menyimpan..."
                     : modalMode === "create"
-                    ? "Simpan"
-                    : "Perbarui"}
+                      ? "Simpan"
+                      : "Perbarui"}
                 </button>
               )}
             </div>
@@ -339,4 +335,3 @@ export default function ProdukPage() {
     </div>
   );
 }
-

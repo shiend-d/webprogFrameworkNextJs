@@ -23,7 +23,7 @@ export default function KeuanganPage() {
   const [rows, setRows] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalMode, setModalMode] = useState<"view" | "create" | "edit" | null>(
-    null
+    null,
   );
   const [selected, setSelected] = useState<Transaction | null>(null);
   const [form, setForm] = useState({
@@ -53,7 +53,7 @@ export default function KeuanganPage() {
         render: (value: number) =>
           typeof value === "number"
             ? value.toLocaleString("id-ID")
-            : value ?? "-",
+            : (value ?? "-"),
       },
       {
         key: "kategori",
@@ -62,7 +62,7 @@ export default function KeuanganPage() {
           row.kategori ?? row.jenis_transaksi ?? "Tidak diketahui",
       },
     ],
-    []
+    [],
   );
 
   async function load() {
@@ -75,7 +75,7 @@ export default function KeuanganPage() {
           (json.data ?? []).map((row) => ({
             ...row,
             kategori: row.kategori ?? row.jenis_transaksi ?? "Tidak diketahui",
-          }))
+          })),
         );
       }
     } catch (error) {
@@ -114,11 +114,11 @@ export default function KeuanganPage() {
         (row["tanggal_waktu"] as string) ??
         "",
       nominal:
-        typeof row.nominal === "number" ? String(row.nominal) : String(row.nominal ?? ""),
+        typeof row.nominal === "number"
+          ? String(row.nominal)
+          : String(row.nominal ?? ""),
       kategori:
-        (row.kategori as string) ??
-        (row.jenis_transaksi as string) ??
-        "",
+        (row.kategori as string) ?? (row.jenis_transaksi as string) ?? "",
       keterangan: String(row["detail"] ?? row["deskripsi"] ?? ""),
     });
     setModalMode("edit");
@@ -137,7 +137,9 @@ export default function KeuanganPage() {
     try {
       setSubmitting(true);
       const isEdit = modalMode === "edit" && selected?.id != null;
-      const url = isEdit ? `/api/transaksi?id=${selected?.id}` : "/api/transaksi";
+      const url = isEdit
+        ? `/api/transaksi?id=${selected?.id}`
+        : "/api/transaksi";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -162,7 +164,7 @@ export default function KeuanganPage() {
   async function handleDelete(row: Transaction) {
     if (!row.id) return;
     const ok = window.confirm(
-      `Hapus transaksi dengan ID "${row.id}" dari data?`
+      `Hapus transaksi dengan ID "${row.id}" dari data?`,
     );
     if (!ok) return;
 
@@ -222,9 +224,7 @@ export default function KeuanganPage() {
             <div className="space-y-4 overflow-y-auto px-6 py-4 text-xs text-black">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="font-medium text-black">
-                    ID Transaksi
-                  </label>
+                  <label className="font-medium text-black">ID Transaksi</label>
                   <input
                     type="text"
                     value={selected?.id ?? "-"}
@@ -241,8 +241,9 @@ export default function KeuanganPage() {
                     value={
                       modalMode === "view"
                         ? (selected?.kategori ??
-                            selected?.jenis_transaksi ??
-                            "") ?? ""
+                          selected?.jenis_transaksi ??
+                          "" ??
+                          "")
                         : form.kategori
                     }
                     onChange={(e) =>
@@ -263,9 +264,10 @@ export default function KeuanganPage() {
                     value={
                       modalMode === "view"
                         ? (selected?.tanggal_transaksi ??
-                            selected?.tanggal ??
-                            selected?.["tanggal_waktu"] ??
-                            "") ?? ""
+                          selected?.tanggal ??
+                          selected?.["tanggal_waktu"] ??
+                          "" ??
+                          "")
                         : form.tanggal
                     }
                     onChange={(e) =>
@@ -278,14 +280,12 @@ export default function KeuanganPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-medium text-black">
-                    Nominal (Rp)
-                  </label>
+                  <label className="font-medium text-black">Nominal (Rp)</label>
                   <input
                     type="number"
                     value={
                       modalMode === "view"
-                        ? selected?.nominal ?? ""
+                        ? (selected?.nominal ?? "")
                         : form.nominal
                     }
                     onChange={(e) =>
@@ -308,8 +308,9 @@ export default function KeuanganPage() {
                   value={
                     modalMode === "view"
                       ? (selected?.["detail"] ??
-                          selected?.["deskripsi"] ??
-                          "") ?? ""
+                        selected?.["deskripsi"] ??
+                        "" ??
+                        "")
                       : form.keterangan
                   }
                   onChange={(e) =>
@@ -327,8 +328,7 @@ export default function KeuanganPage() {
               <button
                 type="button"
                 onClick={() => setModalMode(null)}
-                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300"
-              >
+                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300">
                 Tutup
               </button>
               {modalMode === "view" && (
@@ -336,15 +336,13 @@ export default function KeuanganPage() {
                   <button
                     type="button"
                     onClick={() => selected && openEdit(selected)}
-                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-                  >
+                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
                     Edit Data
                   </button>
                   <button
                     type="button"
                     onClick={() => selected && handleDelete(selected)}
-                    className="rounded-md bg-rose-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-700"
-                  >
+                    className="rounded-md bg-rose-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-700">
                     Hapus
                   </button>
                 </>
@@ -354,13 +352,12 @@ export default function KeuanganPage() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
-                >
+                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70">
                   {submitting
                     ? "Menyimpan..."
                     : modalMode === "create"
-                    ? "Simpan"
-                    : "Perbarui"}
+                      ? "Simpan"
+                      : "Perbarui"}
                 </button>
               )}
             </div>
@@ -370,4 +367,3 @@ export default function KeuanganPage() {
     </div>
   );
 }
-

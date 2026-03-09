@@ -23,7 +23,7 @@ export default function BahanBakuPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalMode, setModalMode] = useState<"view" | "create" | "edit" | null>(
-    null
+    null,
   );
   const [selected, setSelected] = useState<Material | null>(null);
   const [form, setForm] = useState({
@@ -38,7 +38,7 @@ export default function BahanBakuPage() {
   const columns: ColumnDef<Material>[] = useMemo(
     () => [
       { key: "id", header: "ID Bahan Baku" },
-      { key: "nama", header: "Nama Bahan Baku" }, 
+      { key: "nama", header: "Nama Bahan Baku" },
       { key: "tipe", header: "Tipe" },
       {
         key: "stok",
@@ -46,7 +46,9 @@ export default function BahanBakuPage() {
         align: "center",
         render: (_value, row) => {
           const qty =
-            typeof row.stok === "number" ? row.stok.toString() : row.stok ?? "";
+            typeof row.stok === "number"
+              ? row.stok.toString()
+              : (row.stok ?? "");
           const unit = row.satuan ?? "";
           return [qty, unit].filter(Boolean).join(" ");
         },
@@ -58,10 +60,10 @@ export default function BahanBakuPage() {
         render: (value: number) =>
           typeof value === "number"
             ? value.toLocaleString("id-ID")
-            : value ?? "-",
+            : (value ?? "-"),
       },
     ],
-    []
+    [],
   );
 
   async function load() {
@@ -107,8 +109,7 @@ export default function BahanBakuPage() {
       tipe: String(row.tipe ?? ""),
       stok: row.stok != null ? String(row.stok) : "",
       satuan: String(row.satuan ?? ""),
-      harga_satuan:
-        row.harga_satuan != null ? String(row.harga_satuan) : "",
+      harga_satuan: row.harga_satuan != null ? String(row.harga_satuan) : "",
     });
     setModalMode("edit");
   }
@@ -121,9 +122,7 @@ export default function BahanBakuPage() {
       tipe: form.tipe,
       stok: form.stok ? Number(form.stok) : undefined,
       satuan: form.satuan || undefined,
-      harga_satuan: form.harga_satuan
-        ? Number(form.harga_satuan)
-        : undefined,
+      harga_satuan: form.harga_satuan ? Number(form.harga_satuan) : undefined,
     };
 
     try {
@@ -156,7 +155,7 @@ export default function BahanBakuPage() {
   async function handleDelete(row: Material) {
     if (!row.id) return;
     const ok = window.confirm(
-      `Hapus bahan baku "${row.nama ?? row.id}" dari data?`
+      `Hapus bahan baku "${row.nama ?? row.id}" dari data?`,
     );
     if (!ok) return;
 
@@ -233,7 +232,7 @@ export default function BahanBakuPage() {
                   <input
                     type="text"
                     value={
-                      modalMode === "view" ? selected?.nama ?? "" : form.nama
+                      modalMode === "view" ? (selected?.nama ?? "") : form.nama
                     }
                     onChange={(e) =>
                       modalMode !== "view" &&
@@ -249,7 +248,7 @@ export default function BahanBakuPage() {
                   <input
                     type="text"
                     value={
-                      modalMode === "view" ? selected?.tipe ?? "" : form.tipe
+                      modalMode === "view" ? (selected?.tipe ?? "") : form.tipe
                     }
                     onChange={(e) =>
                       modalMode !== "view" &&
@@ -265,7 +264,7 @@ export default function BahanBakuPage() {
                   <input
                     type="number"
                     value={
-                      modalMode === "view" ? selected?.stok ?? "" : form.stok
+                      modalMode === "view" ? (selected?.stok ?? "") : form.stok
                     }
                     onChange={(e) =>
                       modalMode !== "view" &&
@@ -282,7 +281,7 @@ export default function BahanBakuPage() {
                     type="text"
                     value={
                       modalMode === "view"
-                        ? selected?.satuan ?? ""
+                        ? (selected?.satuan ?? "")
                         : form.satuan
                     }
                     onChange={(e) =>
@@ -297,14 +296,12 @@ export default function BahanBakuPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-black">
-                  Harga (Rp)
-                </label>
+                <label className="font-medium text-black">Harga (Rp)</label>
                 <input
                   type="number"
                   value={
                     modalMode === "view"
-                      ? selected?.harga_satuan ?? ""
+                      ? (selected?.harga_satuan ?? "")
                       : form.harga_satuan
                   }
                   onChange={(e) =>
@@ -322,8 +319,7 @@ export default function BahanBakuPage() {
               <button
                 type="button"
                 onClick={() => setModalMode(null)}
-                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300"
-              >
+                className="rounded-md bg-slate-200 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-300">
                 Tutup
               </button>
               {modalMode === "view" && (
@@ -331,15 +327,13 @@ export default function BahanBakuPage() {
                   <button
                     type="button"
                     onClick={() => selected && openEdit(selected)}
-                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-                  >
+                    className="rounded-md bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-emerald-700">
                     Edit Data
                   </button>
                   <button
                     type="button"
                     onClick={() => selected && handleDelete(selected)}
-                    className="rounded-md bg-rose-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-700"
-                  >
+                    className="rounded-md bg-rose-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-rose-700">
                     Hapus
                   </button>
                 </>
@@ -349,13 +343,12 @@ export default function BahanBakuPage() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70"
-                >
+                  className="rounded-md bg-emerald-700 px-5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-70">
                   {submitting
                     ? "Menyimpan..."
                     : modalMode === "create"
-                    ? "Simpan"
-                    : "Perbarui"}
+                      ? "Simpan"
+                      : "Perbarui"}
                 </button>
               )}
             </div>
@@ -365,4 +358,3 @@ export default function BahanBakuPage() {
     </div>
   );
 }
-
