@@ -1,5 +1,5 @@
 "use client";
-
+// Yusuf Abdurrahman - 247006111102
 import { useEffect, useMemo, useState } from "react";
 import { DataTable, ColumnDef } from "@/components/DataTable";
 
@@ -55,7 +55,7 @@ export default function ProdukPage() {
     ],
     [],
   );
-
+// Yusuf Abdurrahman - 247006111102
   async function fetchProducts() {
     try {
       setLoading(true);

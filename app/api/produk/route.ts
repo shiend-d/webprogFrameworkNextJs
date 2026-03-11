@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDB } from "@/lib/db";
-
+// Yusuf Abdurrahman - 247006111102
 export async function GET(req: NextRequest) {
   try {
     const db = getDB();
@@ -73,7 +73,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    // Avoid accidentally trying to update the primary key
+
     if ("id" in body) {
       delete body.id;
     }
