@@ -1,14 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 import { getDB } from "@/lib/db";
 
+function requireAuth(req: NextRequest) {
+  const token = req.cookies.get("admin_token")?.value;
+  if (!token || !verifyToken(token)) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unauthorized",
+      },
+      { status: 401 },
+    );
+  }
+
+  return null;
+}
+
 export async function GET(req: NextRequest) {
+  const unauthorized = requireAuth(req);
+  if (unauthorized) return unauthorized;
+
   try {
     const db = getDB();
     const id = req.nextUrl.searchParams.get("id");
 
     const [rows] = (await db.query(
       id ? "SELECT * FROM transaksi WHERE id = ?" : "SELECT * FROM transaksi",
-      id ? [id] : []
+      id ? [id] : [],
     )) as any;
 
     return NextResponse.json(
@@ -17,7 +36,7 @@ export async function GET(req: NextRequest) {
         message: "Transaksi fetched successfully",
         data: rows,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("GET /api/transaksi error:", error);
@@ -27,12 +46,15 @@ export async function GET(req: NextRequest) {
         message: "Failed to fetch transaksi",
         error: error.message ?? "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(req: NextRequest) {
+  const unauthorized = requireAuth(req);
+  if (unauthorized) return unauthorized;
+
   try {
     const db = getDB();
     const body = await req.json();
@@ -50,7 +72,7 @@ export async function POST(req: NextRequest) {
           ...body,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("POST /api/transaksi error:", error);
@@ -60,12 +82,15 @@ export async function POST(req: NextRequest) {
         message: "Failed to create transaksi",
         error: error.message ?? "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(req: NextRequest) {
+  const unauthorized = requireAuth(req);
+  if (unauthorized) return unauthorized;
+
   try {
     const db = getDB();
     const id = req.nextUrl.searchParams.get("id");
@@ -90,7 +115,7 @@ export async function PUT(req: NextRequest) {
           ...body,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("PUT /api/transaksi error:", error);
@@ -100,12 +125,15 @@ export async function PUT(req: NextRequest) {
         message: "Failed to update transaksi",
         error: error.message ?? "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(req: NextRequest) {
+  const unauthorized = requireAuth(req);
+  if (unauthorized) return unauthorized;
+
   try {
     const db = getDB();
     const id = req.nextUrl.searchParams.get("id");
@@ -122,7 +150,7 @@ export async function DELETE(req: NextRequest) {
         message: "Transaksi deleted successfully",
         data: { id },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error("DELETE /api/transaksi error:", error);
@@ -132,8 +160,7 @@ export async function DELETE(req: NextRequest) {
         message: "Failed to delete transaksi",
         error: error.message ?? "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-
